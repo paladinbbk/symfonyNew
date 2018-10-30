@@ -21,6 +21,17 @@ class ArticleRepository extends ServiceEntityRepository
     }
 
 
+    public function getArticlesByCategoryName($name)
+    {
+        return $this->createQueryBuilder('a')
+            ->join('a.category', 'category')
+            ->where('category.title = :name')
+            ->setParameter('name', $name)
+            ->getQuery()
+            ->getOneOrNullResult()
+            ;
+    }
+
 
 //    public function getArticlesByCategory(Category $category)
 //    {
