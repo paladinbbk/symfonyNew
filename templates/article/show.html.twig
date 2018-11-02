@@ -4,6 +4,13 @@
 
 {% block body %}
     <h1>Article</h1>
+    {% for message in app.flashes('article-updated') %}
+        <div class="flash-notice">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    <img src="/uploads/{{ article.image }}">
 
     <table class="table">
         <tbody>
@@ -25,6 +32,20 @@
             </tr>
         </tbody>
     </table>
+
+    <ul>
+        {% for comment in article.comments %}
+            <li><p>{{ comment.text }}</p><p>({{ comment.author }})</p><p>{{ comment.createdAt |date('Y-m-d H:i:s')}}</p></li>
+        {% endfor %}
+    </ul>
+
+    <form action="{{ path('article_create_comment', {'article': article.id}) }}" method="post">
+        <textarea name="text" required></textarea>
+        <br>
+        <button type="submit">Comment</button>
+    </form>
+
+<br><br><br><br>
 
     <a href="{{ path('article_index') }}">back to list</a>
 
