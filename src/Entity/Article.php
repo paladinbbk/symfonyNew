@@ -5,6 +5,8 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -57,6 +59,8 @@ final class Article
      */
     private $image;
 
+    private $imageFile;
+
     public function __construct()
     {
         $this->comments = new ArrayCollection();
@@ -70,6 +74,52 @@ final class Article
     public function __toString()
     {
         return $this->title ? $this->title : 'New article' ;
+    }
+
+    public function imageUpload()
+    {
+        $file = $this->getImageFile();
+
+        if (!$file || !$file instanceof UploadedFile) {
+            return;
+        }
+
+        $fileName = uniqid() . '.' . $file->guessExtension();
+
+        // Move the file to the directory where brochures are stored
+        try {
+            $file->move(
+                realpath('uploads'),
+                //$this->get('kernel.project_dir'). '/public/uploads',
+                $fileName
+            );
+
+            $this->removeImage();
+
+            $this->setImage($fileName);
+        } catch (FileException $e) {
+            // ... handle exception if something happens during file upload
+        }
+    }
+
+    /**
+     * @ORM\PostRemove
+     */
+    public function removeImage()
+    {
+        $oldFile = realpath('uploads'). '/' .$this->getImage();
+        if (is_file($oldFile)) {
+            unlink($oldFile);
+        }
+    }
+
+    public function getImagePath()
+    {
+        if ($this->getImage()) {
+            return "/uploads/{$this->getImage()}";
+        }
+
+        return "/uploads/notFound.jpg";
     }
 
     /**
@@ -187,4 +237,24 @@ final class Article
 
         return $this;
     }
+
+    /**
+     * @return mixed
+     */
+    public function getImageFile()
+    {
+        return $this->imageFile;
+    }
+
+    /**
+     * @param mixed $imageFile
+     * @return Article
+     */
+    public function setImageFile($imageFile)
+    {
+        $this->imageFile = $imageFile;
+        return $this;
+    }
+
+
 }

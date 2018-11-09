@@ -16,7 +16,7 @@ class ArticleType extends AbstractType
         $builder
             ->add('title', TextType::class, ['label' => 'Название'])
             ->add('content', null , ['required' =>false])
-            ->add('image', FileType::class, ['required' => false, 'label' => 'Article image'])
+            ->add('imageFile', FileType::class, ['required' => false, 'label' => 'Article image'])
       //      ->add('createdAt')
             ->add('category')
         ;

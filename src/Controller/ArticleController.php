@@ -8,6 +8,7 @@ use App\Form\ArticleType;
 use App\Repository\ArticleRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,8 +23,9 @@ class ArticleController extends AbstractController
     /**
      * @Route("/", name="article_index", methods="GET")
      */
-    public function index(ArticleRepository $articleRepository, Request $request): Response
+    public function index(ArticleRepository $articleRepository, Request $request, ParameterBagInterface $parameterBag): Response
     {
+        dump(getenv('APP_SECRET'));
         return $this->render('article/index.html.twig', ['articles' => $articleRepository->findAll()]);
     }
 
@@ -39,25 +41,7 @@ class ArticleController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            $file = $article->getImage();
-
-            $fileName = uniqid().'.'.$file->guessExtension();
-
-            // Move the file to the directory where brochures are stored
-            try {
-                $file->move(
-                    realpath('uploads'),
-                    //$this->get('kernel.project_dir'). '/public/uploads',
-                    $fileName
-                );
-            } catch (FileException $e) {
-                // ... handle exception if something happens during file upload
-            }
-
-            // updates the 'brochure' property to store the PDF file name
-            // instead of its contents
-            $article->setImage($fileName);
-
+            $article->imageUpload();
             $article->setAuthor($this->getUser());
 
             $em = $this->getDoctrine()->getManager();
@@ -86,14 +70,12 @@ class ArticleController extends AbstractController
      */
     public function edit(Request $request, Article $article): Response
     {
-        $article->setImage(
-            new File(realpath('uploads').'/'.$article->getImage())
-        );
-
         $form = $this->createForm(ArticleType::class, $article);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+
+            $article->imageUpload();
 
             $this->getDoctrine()->getManager()->flush();
 
@@ -113,7 +95,7 @@ class ArticleController extends AbstractController
      */
     public function delete(Request $request, Article $article): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$article->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $article->getId(), $request->request->get('_token'))) {
             $em = $this->get('doctrine.entity_manager');
             $em->remove($article);
             $em->flush();
@@ -130,8 +112,7 @@ class ArticleController extends AbstractController
         $comment = (new Comment())
             ->setArticle($article)
             ->setAuthor($this->getUser())
-            ->setText($request->get('text'))
-            ;
+            ->setText($request->get('text'));
 
         $entityManager->persist($comment);
         $entityManager->flush();
