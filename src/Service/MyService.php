@@ -4,6 +4,7 @@ namespace App\Service;
 
 use App\Repository\ArticleRepository;
 use Symfony\Component\DependencyInjection\Container;
+use App\Exception\MyException;
 
 class MyService
 {
@@ -16,6 +17,10 @@ class MyService
 
     public function getAllArticles()
     {
+        if (!$error = true) {
+            throw new MyException();
+        }
+
         return $this->articleRepository->findAll();
     }
 }
