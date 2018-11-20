@@ -7,14 +7,15 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-class MyVoter extends Voter
+class ArticleVoter extends Voter
 {
     protected function supports($attribute, $subject)
     {
-        return false;
-        // replace with your own logic
-        // https://symfony.com/doc/current/security/voters.html
-        return in_array($attribute, ['true', 'false']);
+        if (!$subject instanceof Article) {
+            return false;
+        }
+
+        return true;
     }
 
     protected function voteOnAttribute($attribute, $subject, TokenInterface $token)
@@ -25,7 +26,7 @@ class MyVoter extends Voter
             return false;
         }
 
-        if ($attribute == 'true') {
+        if ($user == $subject->getAuthor()) {
             return true;
         }
 

@@ -11,6 +11,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -20,6 +21,30 @@ use Symfony\Component\Routing\Annotation\Route;
  */
 class ArticleController extends AbstractController
 {
+    /**
+     * @Route("/api/articles", name="article_index_api", methods="GET")
+     */
+    public function indexApi(ArticleRepository $articleRepository, Request $request, ParameterBagInterface $parameterBag): Response
+    {
+        $articles = $articleRepository->findAll();
+
+        $data = [];
+
+        foreach ($articles as $article) {
+            $item['title'] = $article->getTitle();
+            $item['content'] = $article->getContent();
+            $item['createdAt'] = $article->getCreatedAt()->format('Y-m-d');
+            $data['article'][] = $item;
+        }
+
+        $response = new JsonResponse($data);
+        $response->headers->set('contentType', 'json');
+
+        return $response;
+
+        return $this->render('article/index.html.twig', ['articles' => $articleRepository->findAll()]);
+    }
+
     /**
      * @Route("/", name="article_index", methods="GET")
      */
