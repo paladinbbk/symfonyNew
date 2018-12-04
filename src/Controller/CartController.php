@@ -3,12 +3,14 @@
 namespace App\Controller;
 
 use App\Service\CartManager;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Annotation\Route;
 
 /**
  * @Route("/cart")
  */
-class CartController
+class CartController extends AbstractController
 {
     /**
      * @Route("/", name="cart_index")

@@ -7,6 +7,7 @@ use App\Exception\MyException;
 use App\Repository\ArticleRepository;
 use App\Service\MyService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
 class MainController extends AbstractController
@@ -14,7 +15,7 @@ class MainController extends AbstractController
     /**
      * @Route("/", name="main")
      */
-    public function index(ArticleRepository $articleRepository, MyService $myService)
+    public function index(ArticleRepository $articleRepository, MyService $myService, Request $request)
     {
         //$articles = $articleRepository->findAll();
 

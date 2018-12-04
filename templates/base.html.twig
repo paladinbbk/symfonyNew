@@ -2,18 +2,22 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>{% block title %}Welcome!{% endblock %}</title>
+        <title>{% block title %}{{ 'words.welcome'|trans}}{% endblock %}</title>
         {% block stylesheets %}{% endblock %}
     </head>
     <body>
+    {% for locale in locales %}
+        <a href="{{ path(app.request.attributes.get('_route'),app.request.attributes.get('_route_params')|merge({ _locale: locale } )) }}">{{ locale|capitalize }}</a>
+    {% endfor %}
         {% block body %}
-            <header>header</header>
+            <header>{{ 'main.header'|trans}}</header>
+
             <div class="container">
                 <div class="main">
                     {% block content %}{% endblock %}
                 </div>
             </div>
-            <footer>footer</footer>
+            <footer>{{ 'main.footer'|trans}}</footer>
         {% endblock %}
         {% block javascripts %}
 

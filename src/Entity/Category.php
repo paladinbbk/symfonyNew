@@ -5,23 +5,21 @@ namespace App\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Knp\DoctrineBehaviors\Model as ORMBehaviors;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\CategoryRepository")
  */
 class Category
 {
+    use ORMBehaviors\Translatable\Translatable;
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()
      * @ORM\Column(type="integer")
      */
     private $id;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $title;
 
     /**
      * @ORM\OneToMany(targetEntity="App\Entity\Article", mappedBy="category")
@@ -33,26 +31,14 @@ class Category
         $this->articles = new ArrayCollection();
     }
 
-    public function __toString()
-    {
-        return $this->title ? $this->title : 'New';
-    }
+//    public function __toString()
+//    {
+//        return $this->title ? $this->title : 'New';
+//    }
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getTitle(): ?string
-    {
-        return $this->title;
-    }
-
-    public function setTitle(string $title): self
-    {
-        $this->title = $title;
-
-        return $this;
     }
 
     /**
